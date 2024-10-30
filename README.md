@@ -5,16 +5,15 @@
 
 #Default Users
 #ADMIN User
-UserName = "admin",
-Email = "admin@admin.com",
-PhoneNumber = "02220514774",
-Password = "admin",
+UserName = "admin"
+Email = "admin@admin.com"
+Password = "admin"
 Role = Admin
 
 #Normal User
-UserName = "user",
-Email = "user@admin.com",
-Password = "user",
+UserName = "user"
+Email = "user@admin.com"
+Password = "user"
 Role = User
 
 #TMS.Web is the Default project 
