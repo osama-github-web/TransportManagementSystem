@@ -9,6 +9,8 @@ public class ApplicationUser : IdentityUser
     public string? Role {  get; set; }
     [NotMapped]
     public string? Password {  get; set; }
+    [NotMapped]
+    public string? ConfirmPassword {  get; set; }
 
     public ApplicationUser Update(ApplicationUser user) 
     { 

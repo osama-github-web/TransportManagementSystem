@@ -1,0 +1,218 @@
+﻿@model IEnumerable<TMS.Domain.Entities.Vehicle>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vehicleModal">
+    Add Vehicle
+</button>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>VIN</th>
+            <th>Number</th>
+            <th>Description</th>
+            <th>Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            @foreach (var vehicle in Model)
+            {
+                <tr>
+                    <td>@vehicle.Id</td>
+                    <td>@vehicle.VIN</td>
+                    <td>@vehicle.Number</td>
+                    <td>@vehicle.Description</td>
+                    <td>@vehicle.Notes</td>
+                    <th>
+                        <button class="btn btn-outline-danger" onclick="deleteVehicle('@vehicle.Id')">
+                            Delete
+                        </button>
+                        <button type="button" onclick="getVehicle('@vehicle.Id')" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#updateVehicleModal">
+                            Update 
+                        </button>
+                    </th>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<!-- Start: Add Modal -->
+<div class="modal fade" id="vehicleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Vehicle Model</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-control mb-3">
+                    <label for="vin" class="form-label">VIN</label>
+                    <input type="text" name="vin" class="form-control" id="vin" placeholder="Enter Vehicle VIN">
+                </div>
+
+                <div class="form-control mb-3">
+                    <label for="number" class="form-label">Number</label>
+                    <input type="text" name="number" class="form-control" id="number" placeholder="Enter Vehicle Number">
+                </div>
+
+                <div class="form-control mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" name="description" class="form-control" id="description" placeholder="Enter Vehicle Description">
+                </div>
+
+                <div class="form-control mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <input type="text" name="notes" class="form-control" id="notes" placeholder="Enter Vehicle Notes">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addVehicle()">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End: Add Modal -->
+
+<!-- Start: Update Modal -->
+<div class="modal fade" id="updateVehicleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Vehicle Model</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <input type="hidden" name="updateVehicleId" id="updateVehicleId" />
+            </div>
+            <div class="modal-body">
+                <div class="form-control mb-3">
+                    <label for="vin" class="form-label">VIN</label>
+                    <input type="text" name="updateVin" class="form-control" id="updateVin" placeholder="Enter Vehicle VIN">
+                </div>
+
+                <div class="form-control mb-3">
+                    <label for="number" class="form-label">Number</label>
+                    <input type="text" name="updateNumber" class="form-control" id="updateNumber" placeholder="Enter Vehicle Number">
+                </div>
+
+                <div class="form-control mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" name="updateDescription" class="form-control" id="updateDescription" placeholder="Enter Vehicle Description">
+                </div>
+
+                <div class="form-control mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <input type="text" name="updateNotes" class="form-control" id="updateNotes" placeholder="Enter Vehicle Notes">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateVehicle()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End: Update Modal -->
+
+
+<script>
+    function addVehicle() {
+        var _vin = $('[name="vin"]').val();
+        var _number = $('[name="number"]').val();
+        var _description = $('[name="description"]').val();
+        var _notes = $('[name="notes"]').val();
+
+        $.ajax({
+            url: '@Url.Action("Add", "Vehicle")',
+            method: 'POST',
+            data: {
+                VIN: _vin,
+                Number: _number,
+                Description: _description,
+                Notes: _notes
+            },
+            async: true,
+            success: function (response) {
+                alert(response.message);
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log('Request failed');
+                console.log(error);
+            }
+        });
+    }
+    
+    
+    function updateVehicle() {
+        var _id = $('[name="updateVehicleId"]').val();
+        var _vin = $('[name="updateVin"]').val();
+        var _number = $('[name="updateNumber"]').val();
+        var _description = $('[name="updateDescription"]').val();
+        var _notes = $('[name="updateNotes"]').val();
+
+        $.ajax({
+            url: '@Url.Action("Update", "Vehicle")',
+            method: 'POST',
+            data: {
+                Id: _id,
+                VIN: _vin,
+                Number: _number,
+                Description: _description,
+                Notes: _notes
+            },
+            async: true,
+            success: function (response) {
+                alert(response.message);
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log('Request failed');
+                console.log(error);
+            }
+        });
+    }
+
+    
+    function getVehicle(vehicleId) {
+        $.ajax({
+            url: '@Url.Action("GetVehicleById", "Vehicle")/' + vehicleId,
+            method: 'GET',
+            success: function (response) {
+                debugger
+                $('[name="updateVehicleId"]').val(response.id);
+                $('[name="updateVin"]').val(response.vin);
+                $('[name="updateNumber"]').val(response.number);
+                $('[name="updateDescription"]').val(response.description);
+                $('[name="updateNotes"]').val(response.notes);
+                console.log(response);
+            },
+            error: function (xhr, status, error) {
+                console.log('Request failed');
+                console.log(error);
+            }
+        });
+    }
+
+
+    function deleteVehicle(vehicleId) {
+        $.ajax({
+            url: '@Url.Action("Delete", "Vehicle")',
+            method: 'POST',
+            data: {
+                Id: vehicleId,
+            },
+            success: function (response) {
+                alert(response.message);
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log('Request failed');
+                console.log(error);
+            }
+        });
+    }
+</script>
