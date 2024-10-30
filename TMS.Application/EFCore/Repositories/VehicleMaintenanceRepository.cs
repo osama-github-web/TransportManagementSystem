@@ -20,6 +20,7 @@ public class VehicleMaintenanceRepository
                       join maintenanceType in _context.MaintenanceTypes on vehicleMaintenance.MaintenanceTypeId equals maintenanceType.Id
                       select new VehicleMaintenance
                       {
+                          Id = vehicleMaintenance.Id,
                           VehicleId = vehicle.Id,
                           Vehicle = vehicle,
                           MaintenanceType = maintenanceType,
@@ -45,6 +46,15 @@ public class VehicleMaintenanceRepository
                       }).FirstOrDefaultAsync();
     }
 
+    public async Task<List<MaintenanceType>?> GetVehicleMaintenancesAsync(int vehicleId)
+    {
+        return await (from vehicle in _context.Vehicles
+                      join vehicleMaintenance in _context.VehicleMaintenances on vehicle.Id equals vehicleMaintenance.VehicleId
+                      join maintenanceType in _context.MaintenanceTypes on vehicleMaintenance.MaintenanceTypeId equals maintenanceType.Id
+                      where vehicleMaintenance.VehicleId == vehicleId
+                      select maintenanceType).ToListAsync();
+    }
+
     public async Task<VehicleMaintenance?> RemoveVehicleMaintenanceAsync(VehicleMaintenance vehicleMaintenance)
     {
         var _vehicleMaintenance = await GetVehicleMaintenanceAsync(vehicleMaintenance.VehicleId, vehicleMaintenance.MaintenanceTypeId);
@@ -54,6 +64,31 @@ public class VehicleMaintenanceRepository
         _context.Remove<VehicleMaintenance>(_vehicleMaintenance);
         if (await _context.SaveChangesAsync() > 0)
             return _vehicleMaintenance;
+        return null;
+    }
+
+    public async Task<VehicleMaintenance?> AddVehicleMaintenanceAsync(VehicleMaintenance vehicleMaintenance)
+    {
+        await _context.AddAsync<VehicleMaintenance>(vehicleMaintenance);
+        if (await _context.SaveChangesAsync() > 0)
+            return vehicleMaintenance;
+        return null;
+    }
+
+    public async Task<VehicleMaintenance?> GetVehicleMaintenanceAsync(int id)
+    {
+        return await _context.VehicleMaintenances.FindAsync(id);
+    }
+
+    public async Task<VehicleMaintenance?> RemoveVehicleMaintenanceAsync(int id)
+    {
+        var vehicleMaintenance = await GetVehicleMaintenanceAsync(id);
+        if (vehicleMaintenance is null)
+            return null;
+
+        _context.Remove<VehicleMaintenance>(vehicleMaintenance);
+        if (await _context.SaveChangesAsync() > 0)
+            return vehicleMaintenance;
         return null;
     }
 }

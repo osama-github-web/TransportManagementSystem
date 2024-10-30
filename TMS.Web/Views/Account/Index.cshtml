@@ -20,10 +20,10 @@
             {
                 var _id = @user.Id;
                 <tr>
-                    <th>@user.UserName</th>
-                    <th>@user.Email</th>
-                    <th>@user.Role</th>
-                    <th><button class="btn btn-outline-danger" onclick="deleteUser('@_id')">Delete</button></th>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td>@user.Role</td>
+                    <td><button class="btn btn-outline-danger" onclick="deleteUser('@_id')">Delete</button></td>
                 </tr>
             }
         }

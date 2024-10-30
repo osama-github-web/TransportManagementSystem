@@ -33,7 +33,7 @@ public class ApplicationUserRepository
     
     public async Task<ApplicationUser?> GetUserByNameAsync(string name)
     {
-        return await _userManager.FindByEmailAsync(name);
+        return await _userManager.FindByNameAsync(name);
     }
 
     public async Task<List<string>?> GetUserRolesAsync(ApplicationUser applicationUser)

@@ -30,6 +30,21 @@ public class ApplicationUserService
         return await _applicationUserRepository.GetUserByIdAsync(userId);
     }
     
+    public async Task<ApplicationUser?> GetUserByUserNameAsync(string userName)
+    {
+        return await _applicationUserRepository.GetUserByNameAsync(userName);
+    }
+    
+    public async Task<List<string>?> GetUserRolesAsync(ApplicationUser applicationUser)
+    {
+        return await _applicationUserRepository.GetUserRolesAsync(applicationUser);
+    }
+    
+    public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
+    {
+        return await _applicationUserRepository.GetUserByEmailAsync(email);
+    }
+    
     public async Task<TMSResponse?> RemoveUserAsync(ApplicationUser applicationUser)
     {
         return await _applicationUserRepository.RemoveUserAsync(applicationUser);

@@ -15,7 +15,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
     x => x.MigrationsAssembly("TMS.Application"));
-    //x => x.MigrationsAssembly("TMS.Application"));
 });
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.SignIn.RequireConfirmedAccount = false;
@@ -55,6 +54,7 @@ builder.Services.AddScoped<VehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<ApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<VehicleService, VehicleService>();
 builder.Services.AddScoped<MaintenanceTypeService, MaintenanceTypeService>();
+builder.Services.AddScoped<VehicleMaintenanceService, VehicleMaintenanceService>();
 
 var app = builder.Build();
 

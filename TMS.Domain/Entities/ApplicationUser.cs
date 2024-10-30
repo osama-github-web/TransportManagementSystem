@@ -11,6 +11,8 @@ public class ApplicationUser : IdentityUser
     public string? Password {  get; set; }
     [NotMapped]
     public string? ConfirmPassword {  get; set; }
+    [NotMapped]
+    public bool IsPersistent { get; set; }
 
     public ApplicationUser Update(ApplicationUser user) 
     { 

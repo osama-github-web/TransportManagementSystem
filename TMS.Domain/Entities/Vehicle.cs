@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TMS.Domain.Entities;
 
@@ -15,6 +16,9 @@ public class Vehicle
     public DateTime UpdatedDate { get; set; }
     public string? CreatedBy { get; set; }
     public string? UpdatedBy { get; set; }
+
+    [NotMapped]
+    public List<MaintenanceType>? MaintenanceTypes { get; set; }
 
     public Vehicle Update(Vehicle vehicle)
     {

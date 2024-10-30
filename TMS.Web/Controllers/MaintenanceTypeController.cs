@@ -9,10 +9,12 @@ namespace TMS.Web.Controllers
     public class MaintenanceTypeController : Controller
     {
         private readonly MaintenanceTypeService _maintenanceTypeService;
+        private readonly VehicleMaintenanceService _vehicleMaintenanceService;
 
-        public MaintenanceTypeController(MaintenanceTypeService maintenanceTypeService)
+        public MaintenanceTypeController(MaintenanceTypeService maintenanceTypeService, VehicleMaintenanceService vehicleMaintenanceService)
         {
             _maintenanceTypeService = maintenanceTypeService;
+            _vehicleMaintenanceService = vehicleMaintenanceService;
         }
 
         public async Task<IActionResult> Index()
@@ -21,6 +23,20 @@ namespace TMS.Web.Controllers
             return View(vehicles);
         }
 
+        [HttpGet("MaintenanceType/GetAllMaintenanceTypes")]
+        public async Task<JsonResult> GetAllMaintenanceTypes()
+        {
+            var maintenanceType = await _maintenanceTypeService.GetAllMaintenanceTypesAsync();
+            return Json(maintenanceType);
+        }
+        
+        [HttpPost("MaintenanceType/AddVehicleMaintenance")]
+        public async Task<JsonResult> AddVehicleMaintenance(VehicleMaintenance vehicleMaintenance)
+        {
+            var _vehicleMaintenance = await _vehicleMaintenanceService.AddVehicleMaintenanceAsync(vehicleMaintenance);
+            return Json(new {Message= "Vehicle Maintenance Added Successfully", VehicleMaintenance = _vehicleMaintenance });
+        }
+        
         [HttpGet("MaintenanceType/GetMaintenanceTypeById/{maintenanceTypeId}")]
         public async Task<JsonResult> GetMaintenanceTypeById(int maintenanceTypeId)
         {

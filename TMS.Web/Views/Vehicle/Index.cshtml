@@ -33,12 +33,46 @@
                         <button type="button" onclick="getVehicle('@vehicle.Id')" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#updateVehicleModal">
                             Update 
                         </button>
+                        <button type="button" onclick="getMaintenanceTypes('@vehicle.Id', '@vehicle.VIN')" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#vehicleMaintenanceModal">
+                            Add Maintenance 
+                        </button>
                     </th>
                 </tr>
             }
         }
     </tbody>
 </table>
+
+<!-- Start: Vehicle Maintenance Modal -->
+<div class="modal fade" id="vehicleMaintenanceModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Vehicle Maintenance Model</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <input type="hidden" name="vm_vehicleId" id="vm_vehicleId">
+            </div>
+            <div class="modal-body">
+                <div class="form-control mb-3">
+                    <label for="vm_vin" class="form-label">Number</label>
+                    <input type="text" name="vm_vin" class="form-control" id="vm_vin" disabled readonly>
+                </div>
+
+                <div class="form-control mb-3">
+                    <label for="vm_MaintenanceType" class="form-label">Maintenance Type</label>
+                    <select name="vm_MaintenanceType" class="form-control" id="vm_MaintenanceType">
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addVehicleMaintenance()">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End: Vehicle Maintenance Modal -->
+
 
 <!-- Start: Add Modal -->
 <div class="modal fade" id="vehicleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -77,6 +111,7 @@
     </div>
 </div>
 <!-- End: Add Modal -->
+
 
 <!-- Start: Update Modal -->
 <div class="modal fade" id="updateVehicleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -119,100 +154,150 @@
 
 
 <script>
-    function addVehicle() {
-        var _vin = $('[name="vin"]').val();
-        var _number = $('[name="number"]').val();
-        var _description = $('[name="description"]').val();
-        var _notes = $('[name="notes"]').val();
 
-        $.ajax({
-            url: '@Url.Action("Add", "Vehicle")',
-            method: 'POST',
-            data: {
-                VIN: _vin,
-                Number: _number,
-                Description: _description,
-                Notes: _notes
-            },
-            async: true,
-            success: function (response) {
-                alert(response.message);
-                location.reload();
-            },
-            error: function (xhr, status, error) {
-                console.log('Request failed');
-                console.log(error);
-            }
-        });
-    }
-    
-    
-    function updateVehicle() {
-        var _id = $('[name="updateVehicleId"]').val();
-        var _vin = $('[name="updateVin"]').val();
-        var _number = $('[name="updateNumber"]').val();
-        var _description = $('[name="updateDescription"]').val();
-        var _notes = $('[name="updateNotes"]').val();
+function getMaintenanceTypes(vehicleId, vehicleVIN) {
 
-        $.ajax({
-            url: '@Url.Action("Update", "Vehicle")',
-            method: 'POST',
-            data: {
-                Id: _id,
-                VIN: _vin,
-                Number: _number,
-                Description: _description,
-                Notes: _notes
-            },
-            async: true,
-            success: function (response) {
-                alert(response.message);
-                location.reload();
-            },
-            error: function (xhr, status, error) {
-                console.log('Request failed');
-                console.log(error);
-            }
-        });
-    }
+    $('[name="vm_vehicleId"]').val(vehicleId);
+    $('[name="vm_vin"]').val(vehicleVIN);
 
-    
-    function getVehicle(vehicleId) {
-        $.ajax({
-            url: '@Url.Action("GetVehicleById", "Vehicle")/' + vehicleId,
-            method: 'GET',
-            success: function (response) {
-                debugger
-                $('[name="updateVehicleId"]').val(response.id);
-                $('[name="updateVin"]').val(response.vin);
-                $('[name="updateNumber"]').val(response.number);
-                $('[name="updateDescription"]').val(response.description);
-                $('[name="updateNotes"]').val(response.notes);
-                console.log(response);
-            },
-            error: function (xhr, status, error) {
-                console.log('Request failed');
-                console.log(error);
-            }
-        });
-    }
+    $.ajax({
+        url: '@Url.Action("GetAllMaintenanceTypes", "MaintenanceType")',
+        method: 'GET',
+        success: function (response) {
+           // $('#vm_MaintenanceType').empty().append('<option value="">Select Maintenance Type</option>');
+
+           response.forEach(function (r) {
+                var option = $('<option></option>')
+                    .attr('value', r.id)
+                    .text(r.name);
+
+                $('#vm_MaintenanceType').append(option);
+            });
+            console.log(response);
+        },
+        error: function (xhr, status, error) {
+            console.error('Request failed:', error);
+        }
+    });
+}
 
 
-    function deleteVehicle(vehicleId) {
-        $.ajax({
-            url: '@Url.Action("Delete", "Vehicle")',
-            method: 'POST',
-            data: {
-                Id: vehicleId,
-            },
-            success: function (response) {
-                alert(response.message);
-                location.reload();
-            },
-            error: function (xhr, status, error) {
-                console.log('Request failed');
-                console.log(error);
-            }
-        });
-    }
+function addVehicleMaintenance() {
+    var _vehicleId = $('[name="vm_vehicleId"]').val();
+    var _vehicleIdanceTypeId = $('[name="vm_MaintenanceType"]').val();
+    debugger
+    $.ajax({
+        url: '@Url.Action("AddVehicleMaintenance", "MaintenanceType")',
+        method: 'POST',
+        data: {
+            VehicleId: _vehicleId,
+            MaintenanceTypeId: _vehicleIdanceTypeId,
+        },
+        async: true,
+        success: function (response) {
+            alert(response.message);
+            location.reload();
+        },
+        error: function (xhr, status, error) {
+            console.log('Request failed');
+            console.log(error);
+        }
+    });
+}
+
+function addVehicle() {
+    var _vin = $('[name="vin"]').val();
+    var _number = $('[name="number"]').val();
+    var _description = $('[name="description"]').val();
+    var _notes = $('[name="notes"]').val();
+
+    $.ajax({
+        url: '@Url.Action("Add", "Vehicle")',
+        method: 'POST',
+        data: {
+            VIN: _vin,
+            Number: _number,
+            Description: _description,
+            Notes: _notes
+        },
+        async: true,
+        success: function (response) {
+            alert(response.message);
+            location.reload();
+        },
+        error: function (xhr, status, error) {
+            console.log('Request failed');
+            console.log(error);
+        }
+    });
+}
+
+
+function updateVehicle() {
+    var _id = $('[name="updateVehicleId"]').val();
+    var _vin = $('[name="updateVin"]').val();
+    var _number = $('[name="updateNumber"]').val();
+    var _description = $('[name="updateDescription"]').val();
+    var _notes = $('[name="updateNotes"]').val();
+
+    $.ajax({
+        url: '@Url.Action("Update", "Vehicle")',
+        method: 'POST',
+        data: {
+            Id: _id,
+            VIN: _vin,
+            Number: _number,
+            Description: _description,
+            Notes: _notes
+        },
+        async: true,
+        success: function (response) {
+            alert(response.message);
+            location.reload();
+        },
+        error: function (xhr, status, error) {
+            console.log('Request failed');
+            console.log(error);
+        }
+    });
+}
+
+
+function getVehicle(vehicleId) {
+    $.ajax({
+        url: '@Url.Action("GetVehicleById", "Vehicle")/' + vehicleId,
+        method: 'GET',
+        success: function (response) {
+            $('[name="updateVehicleId"]').val(response.id);
+            $('[name="updateVin"]').val(response.vin);
+            $('[name="updateNumber"]').val(response.number);
+            $('[name="updateDescription"]').val(response.description);
+            $('[name="updateNotes"]').val(response.notes);
+            console.log(response);
+        },
+        error: function (xhr, status, error) {
+            console.log('Request failed');
+            console.log(error);
+        }
+    });
+}
+
+
+function deleteVehicle(vehicleId) {
+    $.ajax({
+        url: '@Url.Action("Delete", "Vehicle")',
+        method: 'POST',
+        data: {
+            Id: vehicleId,
+        },
+        success: function (response) {
+            alert(response.message);
+            location.reload();
+        },
+        error: function (xhr, status, error) {
+            console.log('Request failed');
+            console.log(error);
+        }
+    });
+}
 </script>
