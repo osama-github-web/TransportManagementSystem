@@ -1,0 +1,185 @@
+﻿@model IEnumerable<TMS.Domain.Entities.MaintenanceType>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vehicleModal">
+    Add Maintenance Type
+</button>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            @foreach (var maintenanceType in Model)
+            {
+                <tr>
+                    <td>@maintenanceType.Id</td>
+                    <td>@maintenanceType.Name</td>
+                    <td>@maintenanceType.Description</td>
+                    <th>
+                        <button class="btn btn-outline-danger" onclick="deleteMaintenanceType('@maintenanceType.Id')">
+                            Delete
+                        </button>
+                        <button type="button" onclick="getMaintenanceType('@maintenanceType.Id')" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#updateVehicleModal">
+                            Update 
+                        </button>
+                    </th>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<!-- Start: Add Modal -->
+<div class="modal fade" id="vehicleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Vehicle Model</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-control mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" id="name" placeholder="Enter Name">
+                </div>
+
+                <div class="form-control mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" name="description" class="form-control" id="description" placeholder="Enter Description">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addVehicle()">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End: Add Modal -->
+
+<!-- Start: Update Modal -->
+<div class="modal fade" id="updateVehicleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Vehicle Model</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <input type="hidden" name="updateMaintenanceTypeId" id="updateMaintenanceTypeId" />
+            </div>
+            <div class="modal-body">
+
+                <div class="form-control mb-3">
+                    <label for="updateName" class="form-label">Name</label>
+                    <input type="text" name="updateName" class="form-control" id="updateName" placeholder="Enter Name">
+                </div>
+
+                <div class="form-control mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" name="updateDescription" class="form-control" id="updateDescription" placeholder="Enter Description">
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateMaintenanceType()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End: Update Modal -->
+
+
+<script>
+    function addVehicle() {
+        var _name = $('[name="name"]').val();
+        var _description = $('[name="description"]').val();
+
+        $.ajax({
+            url: '@Url.Action("Add", "MaintenanceType")',
+            method: 'POST',
+            data: {
+                Name: _name,
+                Description: _description
+            },
+            async: true,
+            success: function (response) {
+                alert(response.message);
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log('Request failed');
+                console.log(error);
+            }
+        });
+    }
+    
+    
+    function updateMaintenanceType() {
+        var _id = $('[name="updateMaintenanceTypeId"]').val();
+        var _name = $('[name="updateName"]').val();
+        var _description = $('[name="updateDescription"]').val();
+
+        $.ajax({
+            url: '@Url.Action("Update", "MaintenanceType")',
+            method: 'POST',
+            data: {
+                Id: _id,
+                Name: _name,
+                Description: _description
+            },
+            async: true,
+            success: function (response) {
+                alert(response.message);
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log('Request failed');
+                console.log(error);
+            }
+        });
+    }
+    
+
+    function getMaintenanceType(maintenanceTypeId) {
+        $.ajax({
+            url: '@Url.Action("GetMaintenanceTypeById", "MaintenanceType")/' + maintenanceTypeId,
+            method: 'GET',
+            success: function (response) {
+                $('[name="updateMaintenanceTypeId"]').val(response.id);
+                $('[name="updateName"]').val(response.name);
+                $('[name="updateDescription"]').val(response.description);
+                console.log(response);
+            },
+            error: function (xhr, status, error) {
+                console.log('Request failed');
+                console.log(error);
+            }
+        });
+    }
+
+
+    function deleteMaintenanceType(maintenanceTypeId) {
+        $.ajax({
+            url: '@Url.Action("Delete", "MaintenanceType")',
+            method: 'POST',
+            data: {
+                Id: maintenanceTypeId,
+            },
+            success: function (response) {
+                alert(response.message);
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log('Request failed');
+                console.log(error);
+            }
+        });
+    }
+</script>

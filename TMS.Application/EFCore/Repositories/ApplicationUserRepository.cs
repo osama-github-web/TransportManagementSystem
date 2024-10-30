@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TMS.Domain.Entities;
 using TMS.Domain.GenericResponse;
 
@@ -15,6 +16,32 @@ public class ApplicationUserRepository
         _roleManager = roleManager;
     }
 
+    public async Task<List<ApplicationUser>?> GetAllUsersAsync()
+    {
+        return await _userManager.Users.ToListAsync();
+    }
+    
+    public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+    {
+        return await _userManager.FindByIdAsync(userId);
+    }
+    
+    public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
+    {
+        return await _userManager.FindByEmailAsync(email);
+    }
+    
+    public async Task<ApplicationUser?> GetUserByNameAsync(string name)
+    {
+        return await _userManager.FindByNameAsync(name);
+    }
+
+    public async Task<List<string>?> GetUserRolesAsync(ApplicationUser applicationUser)
+    {
+        var roles = await _userManager.GetRolesAsync(applicationUser);
+        return roles.ToList();
+    }
+
     public async Task<TMSResponse?> CreateUserAsync(ApplicationUser applicationUser)
     {
         var _user = await _userManager.FindByEmailAsync(applicationUser.Email);
@@ -29,7 +56,7 @@ public class ApplicationUserRepository
             await _roleManager.CreateAsync(new IdentityRole(applicationUser.Role));
 
         identityResult = await _userManager.AddToRoleAsync(applicationUser, applicationUser.Role);
-        if (identityResult.Succeeded)
+        if (!identityResult.Succeeded)
             return new TMSResponse("User Role Not Added", applicationUser);
         return new TMSResponse("User Create Successfully", applicationUser, true);
     }
@@ -48,10 +75,17 @@ public class ApplicationUserRepository
         return new TMSResponse("User Updated Successfully ", applicationUser, true);
     }
     
-    public async Task<TMSResponse?> DeleteUserAsync(ApplicationUser applicationUser)
+    public async Task<TMSResponse?> RemoveUserAsync(ApplicationUser applicationUser)
     {
-        var _user = await _userManager.FindByEmailAsync(applicationUser.Email);
-        if (applicationUser == null || _user != null)
+        ApplicationUser _user = null;
+        if (!string.IsNullOrWhiteSpace(applicationUser.Email))
+            _user = await _userManager.FindByEmailAsync(applicationUser.Email);
+        if(_user is null && !string.IsNullOrWhiteSpace(applicationUser.Id))
+            _user = await _userManager.FindByIdAsync(applicationUser.Id);
+        else if(_user is null && !string.IsNullOrWhiteSpace(applicationUser.UserName))
+            _user = await _userManager.FindByNameAsync(applicationUser.UserName);
+
+        if (_user == null)
             return new TMSResponse("User Not Found", applicationUser);
 
         var identityResult = await _userManager.DeleteAsync(_user);

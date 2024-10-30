@@ -1,0 +1,19 @@
+﻿@model TMS.Domain.Entities.ApplicationUser
+
+<section>
+    <form method="post" asp-action="Login" asp-controller="Account">
+        <div class="mb-3">
+            <label asp-for="UserName" class="form-label">User Name</label>
+            <input asp-for="UserName" class="form-control" placeholder="Enter User Name" autocomplete="on">
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label">Password</label>
+            <input asp-for="Password" class="form-control" placeholder="Enter Password" autocomplete="on">
+        </div>
+        <div class="mb-3 form-check">
+        <input asp-for="IsPersistent" class="form-check-input">
+        <label class="form-check-label" for="IsPersistent">Remember Me</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</section>

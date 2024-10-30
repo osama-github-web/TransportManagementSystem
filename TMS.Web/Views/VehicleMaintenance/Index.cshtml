@@ -1,0 +1,58 @@
+﻿@model IEnumerable<TMS.Domain.Entities.VehicleMaintenance>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>VIN</th>
+            <th>Number</th>
+            <th>Description</th>
+            <th>Notes</th>
+            <th>MaintenanceType</th>
+            <th>Maintenance Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            @foreach (var vehicleMaintenance in Model)
+            {
+                <tr>
+                    <td>@vehicleMaintenance.Id</td>
+                    <td>@vehicleMaintenance.Vehicle.VIN</td>
+                    <td>@vehicleMaintenance.Vehicle.Number</td>
+                    <td>@vehicleMaintenance.Vehicle.Description</td>
+                    <td>@vehicleMaintenance.Vehicle.Notes</td>
+                    <td>@vehicleMaintenance.MaintenanceType.Name</td>
+                    <td>@vehicleMaintenance.MaintenanceType.Description</td>
+                    <td>
+                        <button class="btn btn-outline-danger" onclick="deleteVehicleMaintenance('@vehicleMaintenance.Id')">
+                            Delete
+                        </button>                                          
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<script>
+    function deleteVehicleMaintenance(vmId) {
+        debugger;
+        $.ajax({
+            url: '@Url.Action("Delete", "VehicleMaintenance")',
+            method: 'POST',
+            data: {
+                Id: vmId,
+            },
+            success: function (response) {
+                alert(response.message);
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log('Request failed');
+                console.log(error);
+            }
+        });
+    }
+</script>
