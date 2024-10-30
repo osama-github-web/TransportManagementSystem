@@ -3,9 +3,9 @@ using IMS.Application.EFCore.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using TMS.Application.EFCore.Repositories;
+using TMS.Api.Extensions;
 using TMS.Domain.Entities;
-using TMS.Infrastructure.Services;
+using TMS.Domain.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +16,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
     x => x.MigrationsAssembly("TMS.Application"));
 });
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
     options.SignIn.RequireConfirmedAccount = false;
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
@@ -45,16 +46,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     //options.SlidingExpiration = true;
 });
 
-builder.Services.AddScoped<ApplicationUserRepository, ApplicationUserRepository>();
-builder.Services.AddScoped<MaintenanceTypeRepository, MaintenanceTypeRepository>();
-builder.Services.AddScoped<RolesRepository, RolesRepository>();
-builder.Services.AddScoped<VehicleMaintenanceRepository, VehicleMaintenanceRepository>();
-builder.Services.AddScoped<VehicleRepository, VehicleRepository>();
+builder.Services.AddServices();
 
-builder.Services.AddScoped<ApplicationUserService, ApplicationUserService>();
-builder.Services.AddScoped<VehicleService, VehicleService>();
-builder.Services.AddScoped<MaintenanceTypeService, MaintenanceTypeService>();
-builder.Services.AddScoped<VehicleMaintenanceService, VehicleMaintenanceService>();
 
 var app = builder.Build();
 
@@ -77,4 +70,48 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+
+await AddDefaultUsers(app);
 app.Run();
+
+
+async Task AddDefaultUsers(WebApplication app)
+{
+    var users = new List<ApplicationUser>
+    {
+        new()
+        {
+            UserName = "admin",
+            Email = "admin@admin.com",
+            PhoneNumber = "02220514774",
+            Password = "admin",
+            Role = ERoles.Admin.ToString()
+        },
+        new()
+        {
+            UserName = "user",
+            Email = "user@admin.com",
+            PhoneNumber = "02220514774",
+            Password = "user",
+            Role = ERoles.User.ToString()
+        }
+    };
+
+    using (var scope = app.Services.CreateAsyncScope())
+    {
+        var userManager = (UserManager<ApplicationUser>)scope.ServiceProvider.GetService(typeof(UserManager<ApplicationUser>));
+        var roleManager = (RoleManager<IdentityRole>)scope.ServiceProvider.GetService(typeof(RoleManager<IdentityRole>));
+        foreach (var user in users)
+        {
+            var _user = await userManager.FindByEmailAsync(user.Email);
+            if (_user is null)
+            {
+                await userManager.CreateAsync(user,user.Password);
+                if (await roleManager.RoleExistsAsync(user.Role))
+                    await roleManager.CreateAsync(new IdentityRole(user.Role));
+
+                await userManager.AddToRoleAsync(user,user.Role);
+            }
+        }
+    }
+}

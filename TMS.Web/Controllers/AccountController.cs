@@ -2,12 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TMS.Domain.Entities;
-using TMS.Domain.Enums;
 using TMS.Infrastructure.Services;
 
 namespace TMS.Web.Controllers
 {
-    //[Authorize(Roles ="Admin")]
+    [Authorize(Roles = "Admin")]
     public class AccountController : Controller
     {
         private readonly ApplicationUserService _userService;
@@ -50,7 +49,7 @@ namespace TMS.Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Home");
+            return RedirectToAction("Index", "Home");
         }
 
 
