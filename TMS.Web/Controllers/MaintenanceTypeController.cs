@@ -5,7 +5,7 @@ using TMS.Infrastructure.Services;
 
 namespace TMS.Web.Controllers
 {
-    //[Authorize(Roles = "Admin,User")]
+    [Authorize(Roles = "Admin,User")]
     public class MaintenanceTypeController : Controller
     {
         private readonly MaintenanceTypeService _maintenanceTypeService;

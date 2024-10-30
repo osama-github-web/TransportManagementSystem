@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TMS.Domain.Entities;
 using TMS.Infrastructure.Services;
 
 namespace TMS.Web.Controllers;
 
+[Authorize(Roles = "Admin,User")]
 public class VehicleMaintenanceController : Controller
 {
     private readonly MaintenanceTypeService _maintenanceTypeService;
